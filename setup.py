@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-ext_files = ["pyreBloom/bloom.c"]
+ext_files = ["pyreBloom/bloom.c", "hiredis/async.c", "hiredis/hiredis.c", "hiredis/net.c", "hiredis/sds.c"]
 
 kwargs = {}
 
@@ -11,11 +11,11 @@ try:
     ext_files.append("pyreBloom/pyreBloom.pyx")
     kwargs['cmdclass'] = {'build_ext': build_ext}
 except ImportError:
-    from distutils import Extension
+    from distutils.core import Extension
     ext_files.append("pyreBloom/pyreBloom.c")
     print "Building from C"
 
-ext_modules = [Extension("pyreBloom", ext_files, libraries=['hiredis'])]
+ext_modules = [Extension("pyreBloom", ext_files, include_dirs=['hiredis', "."])]
 
 setup(
     name = 'pyreBloom',
