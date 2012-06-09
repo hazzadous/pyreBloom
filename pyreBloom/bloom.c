@@ -37,6 +37,8 @@ int init_pyrebloom(pyrebloomctxt * ctxt, unsigned char * key, uint32_t capacity,
   //strcpy(ctxt->key, key);
   ctxt->seeds    = (uint32_t *)(malloc(ctxt->hashes * sizeof(uint32_t)));
   // Generate all the seeds
+  // Make sure we get the same seeds on subsequent calls.
+  srand(0);
   for (i = 0; i < ctxt->hashes; ++i) {
     ctxt->seeds[i] = (uint32_t)(rand());
   }
