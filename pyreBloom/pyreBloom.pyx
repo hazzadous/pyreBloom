@@ -24,6 +24,18 @@ import random
 
 cimport bloom
 
+def encode(value):
+  if hasattr(value, '__iter__'):
+    new_value = []
+    for v in value:
+      if isinstance(v, unicode):
+        v = v.encode('utf8')
+      new_value.append(v)
+    return new_value
+  if isinstance(value, unicode):
+    return value.encode('utf8')
+  return value
+
 cdef class pyreBloom(object):
   cdef bloom.pyrebloomctxt context
   cdef bytes               key
@@ -60,6 +72,7 @@ cdef class pyreBloom(object):
     bloom.delete(&self.context)
 
   def put(self, value):
+    value = encode(value)
     if getattr(value, '__iter__', False):
       r = [bloom.add(&self.context, v, len(v)) for v in value]
       bloom.add_complete(&self.context, len(value))
@@ -68,13 +81,16 @@ cdef class pyreBloom(object):
       bloom.add_complete(&self.context, 1)
 
   def add(self, value):
+    value = encode(value)
     self.put(value)
 
   def extend(self, values):
+    value = encode(value)
     self.put(values)
 
   def contains(self, value):
     # If the object is 'iterable'...
+    value = encode(value)
     if getattr(value, '__iter__', False):
       r = [bloom.check(&self.context, v, len(v)) for v in value]
       return [v for v in value if bloom.check_next(&self.context)]
